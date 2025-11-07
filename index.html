@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forever until the end...</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* This rule enables the smooth scrolling animation when jumping to an anchor link */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* --- NEW: Blur Filter for Arrow Button --- */
+        .blur-filter-arrow {
+            /* Applies a consistent blur to the button background */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            /* Important: Prevents the blur from affecting the yellow SVG arrow inside */
+            filter: none; 
+        }
+
+        /* --- BASIC BODY & BACKGROUND CSS --- */
+        body {
+            /* Set constant dark background color */
+            background-color: #0d1a49; 
+            overflow-x: hidden;
+            /* Set default font to Inter */
+            font-family: 'Inter', sans-serif;
+        }
+        
+        #main-content-wrapper {
+            position: relative;
+            z-index: 10;
+            background-color: transparent; 
+        }
+        
+        /* --- DYNAMIC MEDIA BACKGROUND CSS --- */
+        #love-video-bg {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -3; /* Furthest layer back */
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            /* Video opacity */
+            opacity: 0.5; 
+            filter: none;
+        }
+        
+        /* --- INTRO SCREEN CSS --- */
+        #intro-screen {
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: url('titlepic.jpg');
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); 
+        }
+
+
+
+        /* --- Title Font & Glitter Effect --- */
+        .title-font {
+            font-family: 'Great Vibes', cursive;
+            font-weight: 500;
+            /* This creates the glitter text effect */
+            background-image: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            /* Add a subtle shadow for depth */
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* --- NEW: Subtitle Script Font --- */
+        .script-font {
+            font-family: 'Great Vibes', cursive;
+            font-weight: 500;
+        }
+        
+        @keyframes scroll-arrow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+        .scroll-arrow-animate {
+            animation: scroll-arrow 1.5s infinite;
+        }
+        /* --- END INTRO SCREEN CSS --- */
+        
+
+        /* --- FLY-IN ANIMATION CLASSES --- */
+        
+        /* Default for Title Cards (smooth left-to-right slide) */
+        .hidden-card {
+            opacity: 0;
+            transform: translateX(-50px); 
+            transition: opacity 1.0s ease-out, transform 1.0s ease-out; 
+        }
+        
+        /* Animation for the large Chapter Sections (Fade-in) */
+        .hidden-section {
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        /* Final state when JS removes the 'hidden-' class */
+        .animated-card { 
+            animation: none;
+            opacity: 1;
+            transform: translateX(0); 
+        }
+        .animated-section {
+            animation: none;
+            opacity: 1;
+        }
+
+        /* Delay the elements slightly for a staggered effect */
+        .card-delay-0 { transition-delay: 0.05s; }
+        .card-delay-1 { transition-delay: 0.1s; } 
+        .card-delay-2 { transition-delay: 0.15s; } 
+        .card-delay-3 { transition-delay: 0.2s; } 
+        .card-delay-4 { transition-delay: 0.2s; } /* Chapter 1 Section */
+        .card-delay-5 { transition-delay: 0.2s; } /* Chapter 2 Section */
+        .card-delay-6 { transition-delay: 0.2s; } /* Chapter 3 Section */
+
+
+        /* --- GLASSMORHISM FIX: Permanent, consistent blur and styling --- */
+        .glass-card {
+            position: relative;
+            /* Applying the blur filter directly to guarantee it works */
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            /* Ensured semi-opaque background for consistency */
+            background-color: rgba(255, 255, 255, 0.08); 
+
+            /* Applying standard border/shadow to custom class for consistency */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* border border-white/20 */
+        }
+        
+        .glass-card > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* --- Read More gold glow (targeted) --- */
+        .read-more {
+            transition: box-shadow 0.25s ease, transform 0.12s ease;
+            will-change: box-shadow, transform;
+        }
+        .read-more:hover {
+            box-shadow:
+              0 8px 32px rgba(255, 215, 0, 0.28),
+              0 0 12px rgba(255, 200, 40, 0.18);
+            transform: translateY(-3px);
+        }
+        .read-more:active {
+            transform: translateY(-1px);
+        }
+
+        /* keep other button hover behavior unchanged for non read-more buttons */
+    </style>
+</head>
+<body>
+
+    <video muted loop autoplay playsinline id="love-video-bg" src="Van_Gogh_Starry_Night_Animated_Video.mp4"></video>
+
+    <section id="intro-screen">
+        <div class="text-center text-white p-8">
+            <h1 class="title-font text-6xl md:text-8xl font-extrabold mb-8 drop-shadow-lg py-3">
+                Forever until the end...
+            </h1>
+            
+            <p class="script-font text-2xl md:text-3xl font-semibold mb-12 tracking-wider drop-shadow-md">
+                Scroll down to reveal more...
+            </p>
+            
+            <button onclick="document.getElementById('main-content-start').scrollIntoView({ behavior: 'smooth' })" class="scroll-arrow-animate p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer blur-filter-arrow">
+                <svg class="w-8 h-8 mx-auto text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+        </div>
+    </section>
+
+    <div id="main-content-wrapper"> 
+
+        <div id="main-content-start" class="pt-4"></div>
+
+        <div class="w-full p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-16">
+
+            <div class="glass-card p-6 text-center md:col-span-2 lg:col-span-3">
+                <h1 class="text-4xl script-font font-semibold mb-2 
+                bg-gradient-to-r from-yellow-300 via-yellow-100 to-yellow-400 
+                bg-clip-text text-transparent drop-shadow-lg">
+                To my Poko
+                </h1>
+                <p class="script-font text-2xl 
+                bg-gradient-to-r from-yellow-200 via-yellow-100 to-yellow-300 
+                bg-clip-text text-transparent">
+                from ZOD
+                </p>
+            </div>
+
+            <a 
+                href="#love-message-page"
+                class="hidden-card card-delay-0 glass-card transition-all duration-300 hover:bg-white/20 hover:border-white/40 hover:shadow-2xl hover:scale-[1.02] p-6 overflow-hidden cursor-pointer"
+                role="button"
+            >
+                <img 
+                    src="chapter1.jpg" 
+                    alt="Placeholder image for a card" 
+                    class="w-full h-64 object-cover rounded-lg mb-4 shadow-md"
+                    onerror="this.src='https://placehold.co/600x400/cccccc/333333?text=Image+Failed+to+Load'; this.alt='Error loading image'"
+                >
+                <h2 class="text-3xl script-font font-semibold text-center 
+                    bg-gradient-to-r from-yellow-300 via-yellow-100 to-yellow-400 
+                    bg-clip-text text-transparent drop-shadow-md mb-2">
+                    For my Pua
+                </h2>
+                <button class="read-more mt-4 w-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/40 hover:border-white/50 text-white font-bold py-2 px-4 rounded-lg shadow-lg">
+                    Read More
+                </button>
+            </a>
+
+            <a 
+                href="#card2-message-page"
+                class="hidden-card card-delay-1 glass-card transition-all duration-300 hover:bg-white/20 hover:border-white/40 hover:shadow-2xl hover:scale-[1.02] p-6 overflow-hidden cursor-pointer"
+                role="button"
+            >
+                <img 
+                    src="chapter2.jpg" 
+                    alt="Placeholder image for a card" 
+                    class="w-full h-64 object-cover rounded-lg mb-4 shadow-md"
+                    onerror="this.src='https://placehold.co/600x400/cccccc/333333?text=Image+Failed+to+Load'; this.alt='Error loading image'"
+                >
+                <h2 class="text-3xl script-font font-semibold text-center 
+                    bg-gradient-to-r from-yellow-300 via-yellow-100 to-yellow-400 
+                    bg-clip-text text-transparent drop-shadow-md mb-2">
+                    For my Koji
+                </h2>
+                <button class="read-more mt-4 w-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/40 hover:border-white/50 text-white font-bold py-2 px-4 rounded-lg shadow-lg">
+                    Read More
+                </button>
+            </a>
+            
+            <a 
+                href="#card3-message-page"
+                class="hidden-card card-delay-2 glass-card transition-all duration-300 hover:bg-white/20 hover:border-white/40 hover:shadow-2xl hover:scale-[1.02] p-6 overflow-hidden cursor-pointer"
+                role="button"
+            >
+                <img 
+                    src="chapter3.jpg" 
+                    alt="Placeholder image for card" 
+                    class="w-full h-64 object-cover rounded-lg mb-4 shadow-md"
+                    onerror="this.src='https://placehold.co/600x400/cccccc/333333?text=Image+Failed+to+Load'; this.alt='Error loading image'"
+                >
+                <h2 class="text-3xl script-font font-semibold text-center 
+                    bg-gradient-to-r from-yellow-300 via-yellow-100 to-yellow-400 
+                    bg-clip-text text-transparent drop-shadow-md mb-2">
+                    For my Puchkan
+                </h2>
+                <button class="read-more mt-4 w-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/40 hover:border-white/50 text-white font-bold py-2 px-4 rounded-lg shadow-lg">
+                    Read More
+                </button>
+            </a>
+            
+            <div class="glass-card p-6 text-center md:col-span-2 lg:col-span-3 hidden-card card-delay-3">
+                <p class="text-gray-300 text-sm">Just a shmol webpage :(</p>
+            </div>
+
+        </div>
+        
+        <div class="h-[100vh]"></div>
+
+        <section 
+            id="love-message-page" 
+            class="hidden-section card-delay-4 w-full min-h-screen pt-16 pb-16 flex items-center justify-center"
+        >
+            <div class="glass-card w-full max-w-4xl p-8 mx-4 text-center">
+                <h2 class="text-4xl md:text-3xl font-extrabold text-yellow-300 mb-6 tracking-wider">
+                    ✨ Thank you for always being by my side ✨
+                </h2>
+                <div class="mx-auto w-3/4 max-w-sm h-64 bg-black/30 rounded-lg overflow-hidden border border-yellow-300/50 mb-6 flex items-center justify-center">
+                    <img 
+                        src="main1.jpg" 
+                        alt="Placeholder for a special photo" 
+                        class="w-full h-full object-cover"
+                    >
+                </div>
+                <p class="italic text-l text-gray-100 font-medium leading-relaxed max-w-2xl mx-auto">
+                    "Being deeply loved by someone gives you strength, while loving someone deeply gives you courage. Thank you for being my rock, my inspiration, and my greatest adventure. With you, every moment is a treasure, and I look forward to creating countless more memories together."
+                </p>
+                
+                <p class="text-yellow-300 text-lg mt-6 font-semibold">— With all my love</p>
+                <button onclick="document.getElementById('main-content-start').scrollIntoView({ behavior: 'smooth' })" class="mt-8 bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/40 hover:border-white/50 text-white font-bold py-2 px-4 rounded-lg shadow-lg">
+                    Go Back to Cards
+                </button>
+            </div>
+        </section>
+
+        <div class="h-[100vh]"></div>
+
+        <section 
+            id="card2-message-page" 
+            class="hidden-section card-delay-5 w-full min-h-screen pt-16 pb-16 flex items-center justify-center"
+        >
+            <div class="glass-card w-full max-w-4xl p-8 mx-4 text-center">
+                <h2 class="text-4xl md:text-3xl font-extrabold text-indigo-300 mb-6 tracking-wider">
+                    🌌 Thank you for the unforgettable adventures 🌌
+                </h2>
+                <div class="mx-auto w-3/4 max-w-sm h-64 bg-black/30 rounded-lg overflow-hidden border border-indigo-300/50 mb-6 flex items-center justify-center">
+                    <img 
+                        src="main2.jpg" 
+                        alt="Placeholder for an adventure photo" 
+                        class="w-full h-full object-top object-cover mt-0"
+                    >
+                </div>
+                <p class="italic text-l text-gray-100 font-medium leading-relaxed max-w-2xl mx-auto">
+                    "Every moment with you is a treasured memory. I'll always remember our Durga Puja adventure walking nearly 23 kilometers, finding joy even when we were tired. You make the ordinary extraordinary. In the midst of all that beautiful chaos, we found our peaceful moment side-by-side."
+                </p>
+                <p class="text-indigo-300 text-lg mt-6 font-semibold">— Forever Yours</p>
+                <button onclick="document.getElementById('main-content-start').scrollIntoView({ behavior: 'smooth' })" class="mt-8 bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/40 hover:border-white/50 text-white font-bold py-2 px-4 rounded-lg shadow-lg">
+                    Go Back to Cards
+                </button>
+            </div>
+        </section>
+
+        <div class="h-[100vh]"></div>
+
+        <section 
+            id="card3-message-page" 
+            class="hidden-section card-delay-6 w-full min-h-screen pt-16 pb-16 flex items-center justify-center"
+        >
+            <div class="glass-card w-full max-w-4xl p-8 mx-4 text-center">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-emerald-300 mb-6 tracking-wider">
+                    🎨The little artist inside you🎨
+                </h2>
+                <div class="mx-auto w-3/4 max-w-sm h-64 bg-black/30 rounded-lg overflow-hidden border border-emerald-300/50 mb-6 flex items-center justify-center">
+                    <video
+                        src="main3.mp4"
+                        autoplay
+                        muted
+                        loop
+                        playsinline
+                        class="w-full h-full object-cover"
+                        onerror="this.poster='https://placehold.co/400x400/064e3b/a7f3d0?text=Video+Not+Found'; this.style.display='block';"
+                    ></video>
+                </div>
+
+                <p class="italic text-l text-gray-100 font-medium leading-relaxed max-w-2xl mx-auto">
+                    "Watching the little artist inside you come to life is one of my greatest joys. Whether you're painting aesthetic worlds, creating a new crochet piece, or dreaming up cute artworks, that passion and creativity is a truly beautiful part of your soul. I want you to know how much excitement I feel when you share a new creation with me; it’s like seeing a piece of your inner magic made real. And when you dedicate an artwork just for me, it is the most precious gift I could ever receive. I am incredibly grateful for these dedicated masterpieces. Please, never let that brilliant artist fade. Keep creating, keep dreaming, and keep that little artist happy and alive, it brightens my entire world."
+                </p>
+                <p class="text-emerald-300 text-lg mt-6 font-semibold">— Your Biggest Fan</p>
+                <button onclick="document.getElementById('main-content-start').scrollIntoView({ behavior: 'smooth' })" class="mt-8 bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/40 hover:border-white/50 text-white font-bold py-2 px-4 rounded-lg shadow-lg">
+                    Go Back to Cards
+                </button>
+            </div>
+        </section>
+
+        <div class="h-24"></div>
+    
+    </div> 
+    
+    <script type="module" src="main.js"></script>
+
+</body>
+</html>
